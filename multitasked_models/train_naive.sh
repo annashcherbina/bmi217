@@ -1,0 +1,1 @@
+THEANO_FLAGS=device=gpu,floatX=float32 python naive_danQ_train.py /data/deeplearning/multitasked_model/train_data.hdf5 /data/deeplearning/multitasked_model/valid_data.hdf5 /data/deeplearning/multitasked_model/test_data.hdf5  
