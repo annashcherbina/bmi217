@@ -83,7 +83,7 @@ def fitAndEvaluate(model, x_train, y_train, x_valid, y_valid, x_test, y_test):
     model.fit(x_train, 
         y_train, 
         batch_size=100, 
-        nb_epoch=2, 
+        nb_epoch=1, 
         shuffle="batch", 
         show_accuracy=True, 
         validation_data=(x_valid, y_valid), 
