@@ -28,10 +28,12 @@ def loadData(args):
     y_test = testmat['Y']['output']
     return x_train, y_train, x_valid, y_valid, x_test, y_test
 
-def fitAndEvaluate(model, x_train, y_train, x_valid, y_valid, x_test, y_test):
+def fitAndEvaluate(model, model_path, 
+            x_train, y_train, x_valid, y_valid, x_test, y_test):
     print "Running only one epoch"
 
-    checkpointer = ModelCheckpoint(filepath="naive_basset_best.hdf5", verbose=1, save_best_only=True)
+    model_output_path = "best_model_%s.hdf5" % (model_path[:-3])
+    checkpointer = ModelCheckpoint(filepath=model_output_path, verbose=1, save_best_only=True)
     earlystopper = EarlyStopping(monitor='val_loss', patience=5, verbose=1)
 
     model.fit(x_train, 
