@@ -33,6 +33,8 @@ def fitAndEvaluate(model, x_train, y_train, x_valid, y_valid, x_test, y_test):
 
     checkpointer = ModelCheckpoint(filepath="naive_basset_best.hdf5", verbose=1, save_best_only=True)
     earlystopper = EarlyStopping(monitor='val_loss', patience=5, verbose=1)
+    tensorboard = TensorBoard(histogram_freq=0, write_graph=False, write_images=True)
+    csvlogger = CSVLogger('training_results', append = True)
 
     model.fit(x_train, 
         y_train, 
@@ -41,7 +43,7 @@ def fitAndEvaluate(model, x_train, y_train, x_valid, y_valid, x_test, y_test):
         shuffle="batch", 
         show_accuracy=True, 
         validation_data=(x_valid, y_valid), 
-        callbacks=[checkpointer,earlystopper])
+        callbacks=[checkpointer,earlystopper, csvlogger, tensorboard])
 
     results = model.evaluate(x_test, 
         y_test,
