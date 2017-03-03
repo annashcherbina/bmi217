@@ -34,9 +34,8 @@ def get_predictions(hdf5_source,batch_size,individual_task_output_shape,output_t
 
 def parse_args():
     parser=argparse.ArgumentParser(description='Provide a model yaml & weights files & a dataset, get model predictions and accuracy metrics')
-    parser.add_argument('--yaml',help='yaml file that stores model architecture')
-    parser.add_argument('--weights',help='hdf5 file that stores model weights')
-    parser.add_argument('--data',help='hdf5 file that stores the data')
+    parser.add_argument('--model_hdf5',help='hdf5 file that stores the model')
+    parser.add_argument('--data',help='hdf5 file that stores the data -- validation hdf5 file')
     parser.add_argument('--predictions_pickle',help='name of pickle to save predictions')
     parser.add_argument('--accuracy_metrics_file',help='file name to save accuracy metrics')
     parser.add_argument('--predictions_pickle_to_load',help="if predictions have already been generated, provide a pickle with them to just compute the accuracy metrics",default=None)

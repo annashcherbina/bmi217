@@ -1,0 +1,4 @@
+training_results
+log
+*.py~
+*.pyc
