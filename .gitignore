@@ -1,0 +1,5 @@
+*pyc
+*~
+*logs/
+*.hdf5
+*training_results
