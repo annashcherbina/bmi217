@@ -1,0 +1,1 @@
+python ../sample_code/get_model_predictions.py --data /data/deeplearning/multitasked_model/valid_data.hdf5 --model_hdf5 best_model_model1.hdf5 --predictions_pickle model.pkl --accuracy_metrics_file model.accuracy.tsv --sequential
