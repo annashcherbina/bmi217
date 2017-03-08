@@ -18,7 +18,7 @@ def createModel():
     print "Creating model..."
 
     model = Sequential()
-    model.add(Convolution2D(134,4,14,input_shape=(1,4,2000)))
+    model.add(Convolution2D(145,4,14,input_shape=(1,4,2000)))
     model.add(BatchNormalization(mode=0, axis=1))
     model.add(PReLU())
     model.add(MaxPooling2D(pool_size=(1,3)))
