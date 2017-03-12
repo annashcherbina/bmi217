@@ -21,7 +21,7 @@ def get_predictions(hdf5_source,batch_size,individual_task_output_shape,output_t
         predictions[task]=np.zeros(individual_task_output_shape)
     print("initialized output dictionary for predictions")    
     while num_generated < total_entries:
-        print str(num_generated) 
+        print(str(num_generated))
         start_index=num_generated
         end_index=min([total_entries,start_index+batch_size])
         x_batch={}  
