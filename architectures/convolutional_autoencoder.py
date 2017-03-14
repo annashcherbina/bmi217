@@ -29,7 +29,7 @@ import os
 # This function performs handles the I/O of our training, test, and validation chromatin accessibility data sets. To reduce the computation time associated with model training, this function also reduces the number of training examples used to a defined constant.
 def data_io(file_name):
     data = h5py.File(file_name, 'r')
-    # Read in sequence data
+     # I/O One-hot encoded Sequence Data
     x_data = data['X']['sequence']
     if(file_name == 'train_data.hdf5'):
         # Reduce training data set size for computation purposes
@@ -39,11 +39,11 @@ def data_io(file_name):
 # This function is responsible for the construction of the CAE model, as outlined above. In order to test different model constructions, this function has been modified, based on those model constructions.
 def model_development():
     convolutional_autoencoder = Sequential()
-    # First Convolution/Pooling Layer, using 50 4x4 convolutional kernels, a 1x4 pooling size, and a parametric rectified linear unit (PReLU) activation
+    # First Convolution/Pooling Layer, using 50 4x4 convolutional kernels, a 1x4 max pooling size, and a parametric rectified linear unit (PReLU) activation
     convolutional_autoencoder.add(Convolution2D(50, 4, 4, border_mode = 'same', input_shape = (1, 4, 2000), dim_ordering = 'th'))
     convolutional_autoencoder.add(PReLU())
     convolutional_autoencoder.add(MaxPooling2D(pool_size = (1, 4), border_mode = 'same', dim_ordering = 'th'))
-    # Second Convolution/Pooling Layer, using 50 1x4 convolutional kernels, a 1x4 pooling size, and a PReLU activation
+    # Second Convolution/Pooling Layer, using 50 1x4 convolutional kernels, a 1x4 max pooling size, and a PReLU activation
     convolutional_autoencoder.add(Convolution2D(50, 1, 4, border_mode = 'same', dim_ordering = 'th'))
     convolutional_autoencoder.add(PReLU())
     convolutional_autoencoder.add(MaxPooling2D(pool_size = (1, 4), border_mode = 'same' ,dim_ordering = 'th'))
@@ -60,7 +60,7 @@ def model_development():
     convolutional_autoencoder.compile(optimizer = ada_delta, loss = 'binary_crossentropy')
     return convolutional_autoencoder
 
-# This function is responsible for training the CAE, and evaluating its performance (in terms of test loss) on a held out test set. This function also stores the architecture and weights of the best CAE model in a .hdf5 file, while outputting training/validation loss results to a .csv file. In the event that model performance does not improve (as defined by validation loss) for three epochs, the model training will end prematurely to save computation time.
+# This function is responsible for training the CAE, and evaluating its performance (in terms of test loss) on a held out test set. This function also stores the architecture and weights of the best CAE model by epoch in a .hdf5 file, while outputting training/validation loss results to a .csv file. In the event that model performance does not improve (as defined by validation loss) for three epochs, the model training will end prematurely to save computation time.
 def model_evaluation(x_train, x_validation, x_test, convolutional_autoencoder):
     # Saving model archictecture and weights to .hdf5 file
     checkpoint = ModelCheckpoint("optimal_CAE_model8.hdf5", verbose = 1, save_best_only = True)
