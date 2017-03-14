@@ -13,7 +13,9 @@ def parse_args():
     parser.add_argument("--fields_to_include",help="file containing field names to include for summarizing")
     parser.add_argument("--outf")
     parser.add_argument("--result_json",nargs="*",default=[])
-    parser.add_argument("--result_fields",nargs="*",default=[]) 
+    parser.add_argument("--result_csv",nargs="*",default=[])
+    parser.add_argument("--result_fields_json",nargs="*",default=[])
+    parser.add_argument("--result_fields_csv",nargs="*",default=[]) 
     return parser.parse_args()
 
 
@@ -80,8 +82,8 @@ def recurse(data,fields_to_include,parent,aggregate_elems):
     return aggregate_elems
 
 #map results to model architectures 
-def parse_results(args):
-    fields=args.result_fields
+def parse_results_json(args):
+    fields=args.result_fields_json
     dbs=args.result_json
     results=dict() 
     for db in dbs:
@@ -97,6 +99,26 @@ def parse_results(args):
                     performance.append(None) 
             results[yaml_name]=performance
     return results 
+
+#map csv results to model architectures
+def parse_results_csv(args):
+    fields=args.result_fields_csv
+    dbs=args.result_csv
+    results=dict()
+    for db in dbs:
+        data=open(db,'r').read().strip().split('\n')
+        model_name=db.split('/')[-1]
+        performance=dict()
+        for line in data:
+            tokens=line.split('\t')
+            metric_name=tokens[0]
+            metric_vals=[float(i) for i in tokens[2:]]
+            metric_mean=sum(metric_vals)/len(metric_vals)
+            performance[metric_name]=metric_mean
+        results[model_name]=[]
+        for field in fields:
+            results[model_name].append(performance[metric_name])
+    return results
 
 def main():
     args=parse_args()
@@ -137,15 +159,26 @@ def main():
         all_fields=all_fields.union(new_fields)
 
     #add in any known info about the results
-    if (len(args.result_json)>0) and (len(args.result_fields)>0):
-        result_dict=parse_results(args)
+    if (len(args.result_json)>0) and (len(args.result_fields_json)>0):
+        result_dict_json=parse_results_json(args)
     else:
-        result_dict=dict() 
+        result_dict_json=dict() 
 
+    if (len(args.result_csv)>0) and (len(args.result_fields_csv)>0):
+        result_dict_csv=parse_results_csv(args)
+    else:
+        result_dict_csv=dict()
+
+    result_dict_json.update(result_dict_csv)
+    result_dict=result_dict_json
+    
     #write the output
     all_fields=list(all_fields)
-    if len(args.result_fields)>0:
-        all_fields=all_fields+args.result_fields 
+    if len(args.result_fields_json)>0:
+        all_fields=all_fields+args.result_fields_json
+    if len(args.result_fields_csv)>0:
+        all_fields=all_fields+args.result_fields_csv
+    
     outf=open(args.outf,'w')
     outf.write('Model\t'+'\t'.join([str(i) for i in all_fields])+'\n')
     for model in field_dict:
