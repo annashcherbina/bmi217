@@ -1,0 +1,13 @@
+nb_col
+nb_filter
+nb_row
+class_name
+pool_size
+strides
+m
+l2
+l1
+output_dim
+input_dim
+p
+activation
