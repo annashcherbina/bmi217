@@ -1,0 +1,1 @@
+CUDA_VISIBLE_DEVICES=7 python get_model_predictions.py --model_hdf5 ../../vis/optimal_CAE_model.hdf5  --predictions_pickle cae.accuracy.pkl --accuracy_metrics_file cae.accuracy.tsv --sequential --data  ../../../deeplearning/gecco/inputs/gecco.sampled.one.output/test_data.hdf5
