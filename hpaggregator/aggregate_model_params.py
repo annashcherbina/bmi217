@@ -89,15 +89,12 @@ def parse_results_json(args):
     for db in dbs:
         data=json.loads(open(db,'r').read())['records']
         for record in data:
-            yaml_name=record["saved_files_config"]['yaml_file'].split('/')[-1]
+            yaml_name='.'.join(record["saved_files_config"]['yaml_file'].split('/')[-1].split('.')[0:-1])
             perf=record['best_valid_perf_info']['valid_all_stats']
-            performance=[]
+            results[yaml_name]=dict() 
             for field in fields:
                 if field in perf:
-                    performance.append(perf[field])
-                else:
-                    performance.append(None) 
-            results[yaml_name]=performance
+                    results[yaml_name][field]=perf[field]
     return results 
 
 #map csv results to model architectures
@@ -107,17 +104,14 @@ def parse_results_csv(args):
     results=dict()
     for db in dbs:
         data=open(db,'r').read().strip().split('\n')
-        model_name=db.split('/')[-1]
-        performance=dict()
+        model_name='.'.join(db.split('/')[-1].split('.')[0:-1])
+        results[model_name]=dict() 
         for line in data:
             tokens=line.split('\t')
             metric_name=tokens[0]
             metric_vals=[float(i) for i in tokens[2:]]
             metric_mean=sum(metric_vals)/len(metric_vals)
-            performance[metric_name]=metric_mean
-        results[model_name]=[]
-        for field in fields:
-            results[model_name].append(performance[metric_name])
+            results[model_name][metric_name]=metric_mean
     return results
 
 def main():
@@ -141,7 +135,7 @@ def main():
     field_dict=dict()
     all_fields=set([]) 
     for i in range(len(all_models)):
-        cur_model_name=model_names[i].split('/')[-1]
+        cur_model_name='.'.join(model_names[i].split('/')[-1].split('.')[0:-1])
         cur_model=all_models[i]
         field_dict[cur_model_name]=recurse(cur_model,fields_to_include,[],dict())
         #summarize the count of each type of class
@@ -171,6 +165,7 @@ def main():
 
     result_dict_json.update(result_dict_csv)
     result_dict=result_dict_json
+    #print(str(result_dict))
     
     #write the output
     all_fields=list(all_fields)
@@ -178,18 +173,25 @@ def main():
         all_fields=all_fields+args.result_fields_json
     if len(args.result_fields_csv)>0:
         all_fields=all_fields+args.result_fields_csv
-    
+
+    print('\n'.join(field_dict.keys()))
+    print('-------------------------------------------------') 
+    print('\n'.join(result_dict.keys()))
+        
     outf=open(args.outf,'w')
     outf.write('Model\t'+'\t'.join([str(i) for i in all_fields])+'\n')
     for model in field_dict:
+        if model in result_dict:
+            print(str(model))
+            #print(str(result_dict[model]))
+            field_dict[model].update(result_dict[model])
         outf.write(model)
+        #print(str(model))
         for field in all_fields:
             if field in field_dict[model]:
                 outf.write('\t'+str(field_dict[model][field]))
             else:
                 outf.write('\tNone')
-        if model in result_dict:
-            outf.write('\t'+'\t'.join([str(i) for i in result_dict[model]]))
         outf.write('\n')
         
     
