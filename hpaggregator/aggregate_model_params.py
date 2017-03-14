@@ -12,7 +12,8 @@ def parse_args():
     parser.add_argument("--model_hdf5",nargs="+",default=[])
     parser.add_argument("--fields_to_include",help="file containing field names to include for summarizing")
     parser.add_argument("--outf")
-    parser.add_argument("--results_json",nargs="*")
+    parser.add_argument("--result_json",nargs="*",default=[])
+    parser.add_argument("--result_fields",nargs="*",default=[]) 
     return parser.parse_args()
 
 
@@ -78,6 +79,25 @@ def recurse(data,fields_to_include,parent,aggregate_elems):
             recurse(element,fields_to_include,parent,aggregate_elems)
     return aggregate_elems
 
+#map results to model architectures 
+def parse_results(args):
+    fields=args.result_fields
+    dbs=args.result_json
+    results=dict() 
+    for db in dbs:
+        data=json.loads(open(db,'r').read())['records']
+        for record in data:
+            yaml_name=record["saved_files_config"]['yaml_file'].split('/')[-1]
+            perf=record['best_valid_perf_info']['valid_all_stats']
+            performance=[]
+            for field in fields:
+                if field in perf:
+                    performance.append(perf[field])
+                else:
+                    performance.append(None) 
+            results[yaml_name]=performance
+    return results 
+
 def main():
     args=parse_args()
     fields_to_include=open(args.fields_to_include,'r').read().strip().split('\n')
@@ -99,7 +119,7 @@ def main():
     field_dict=dict()
     all_fields=set([]) 
     for i in range(len(all_models)):
-        cur_model_name=model_names[i]
+        cur_model_name=model_names[i].split('/')[-1]
         cur_model=all_models[i]
         field_dict[cur_model_name]=recurse(cur_model,fields_to_include,[],dict())
         #summarize the count of each type of class
@@ -116,9 +136,16 @@ def main():
         new_fields=set(field_dict[cur_model_name].keys())
         all_fields=all_fields.union(new_fields)
 
+    #add in any known info about the results
+    if (len(args.result_json)>0) and (len(args.result_fields)>0):
+        result_dict=parse_results(args)
+    else:
+        result_dict=dict() 
+
     #write the output
     all_fields=list(all_fields)
-    print(str(all_fields))
+    if len(args.result_fields)>0:
+        all_fields=all_fields+args.result_fields 
     outf=open(args.outf,'w')
     outf.write('Model\t'+'\t'.join([str(i) for i in all_fields])+'\n')
     for model in field_dict:
@@ -128,6 +155,8 @@ def main():
                 outf.write('\t'+str(field_dict[model][field]))
             else:
                 outf.write('\tNone')
+        if model in result_dict:
+            outf.write('\t'+'\t'.join([str(i) for i in result_dict[model]]))
         outf.write('\n')
         
     
