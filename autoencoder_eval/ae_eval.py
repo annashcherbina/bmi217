@@ -25,8 +25,15 @@ def main():
     #scrambled data
     X_scrambled=np.empty_like(X)
     X_scrambled[:]=X
-    
+    X_scrambled=np.squeeze(X_scrambled)
+    print(X_scrambled.shape)
     np.random.shuffle(X_scrambled)
+    X_scrambled=np.expand_dims(X_scrambled,axis=0)
+    X_scrambled=np.expand_dims(X_scrambled,axis=0)
+    
+    #X_scrambled=np.random.choice([0, 1], size=(1,1,4,2000), p=[3.0/4, 1.0/4])
+    
+    #X_scrambled=np.random.permutation(X)
     print("got real & scrambled data")
     print(X.shape)
     print(X_scrambled.shape) 
