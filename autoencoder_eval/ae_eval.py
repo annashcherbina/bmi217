@@ -21,7 +21,8 @@ def main():
     #just look at first 100k examples
     X=data['X']['sequence'][0:args.num_samples_to_eval]
     #scrambled data
-    X_scrambled=np.random.shuffle(X)
+    X_scrambled=np.empty_like(X)
+    np.random.shuffle(X_scrambled)
     print("got real & scrambled data")
 
     #load the model
