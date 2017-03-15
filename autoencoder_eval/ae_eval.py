@@ -20,28 +20,17 @@ def main():
 
     #real data
     data=h5py.File(args.dataset)
-    #just look at first 100k examples
     X=np.expand_dims(data['X']['sequence'][args.sample],axis=0)
     #scrambled data
     X_scrambled=np.empty_like(X)
     X_scrambled[:]=X
     X_scrambled=np.squeeze(X_scrambled)
-    print(X_scrambled.shape)
     np.random.shuffle(X_scrambled)
     X_scrambled=np.expand_dims(X_scrambled,axis=0)
     X_scrambled=np.expand_dims(X_scrambled,axis=0)
     
-    #X_scrambled=np.random.choice([0, 1], size=(1,1,4,2000), p=[3.0/4, 1.0/4])
-    
-    #X_scrambled=np.random.permutation(X)
-    print("got real & scrambled data")
-    print(X.shape)
-    print(X_scrambled.shape) 
-    #print(X_scrambled) 
-    #load the model
     model=load_model(args.model)
-    print("loaded the model") 
-
+  
 
     #The layer number
     if args.layer_to_examine!=None:
@@ -52,11 +41,14 @@ def main():
                                       [model.layers[n].output])
     layer_output = get_nth_layer_output([X])[0]
     scrambled_layer_output=get_nth_layer_output([X_scrambled])[0]
+    batch_accuracy=np.sum(X==layer_output)/(1.0*X.shape[0]*X.shape[1]*X.shape[2]*X.shape[3])
+    print(str(batch_accuracy))
     #save the input & output matrices
-    np.savetxt(args.out_prefix+".input.tsv",np.squeeze(X),fmt='%.5f')
-    np.savetxt(args.out_prefix+".scrambled.input.tsv",np.squeeze(X_scrambled),fmt='%.5f')
-    np.savetxt(args.out_prefix+".output.tsv",np.squeeze(layer_output),fmt='%.5f')
-    np.savetxt(args.out_prefix+".scrambled.output.tsv",np.squeeze(scrambled_layer_output),fmt='%.5f')
+    if args.out_prefix!=None:
+        np.savetxt(args.out_prefix+".input.tsv",np.squeeze(X),fmt='%.5f')
+        np.savetxt(args.out_prefix+".scrambled.input.tsv",np.squeeze(X_scrambled),fmt='%.5f')
+        np.savetxt(args.out_prefix+".output.tsv",np.squeeze(layer_output),fmt='%.5f')
+        np.savetxt(args.out_prefix+".scrambled.output.tsv",np.squeeze(scrambled_layer_output),fmt='%.5f')
     #if the user used the --plot flag, generate plots
     if args.plot==True:
         import matplotlib as mpl
@@ -75,7 +67,6 @@ def main():
         plt.imshow(np.squeeze(scrambled_layer_output)[:,0:20],cmap="hot",interpolation="nearest")
         fig.savefig(args.out_prefix+".scrambled.output.png")
         
-    
 if __name__=="__main__":
     main()
     
