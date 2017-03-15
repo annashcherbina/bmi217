@@ -1,1 +1,2 @@
-python ae_eval.py --dataset /data/deeplearning/multitasked_model/test_data.hdf5 --model /data/deep_learning_hdf5_files/deep_learning_model_results/optimal_CAE_model.hdf5 --num_samples_to_eval 1000 --layer_to_examine 3
+python ae_eval.py --dataset /data/deeplearning/multitasked_model/test_data.hdf5 --model optimal_CAE_model.hdf5 --sample 0 --out_prefix autoencoder_eval_sample_0
+
