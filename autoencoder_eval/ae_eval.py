@@ -35,6 +35,7 @@ def main():
     get_nth_layer_output = K.function([model.layers[0].input],
                                       [model.layers[n].output])
     layer_output = get_nth_layer_output([X])[0]
+    scrambled_layer_output=get_nth_layer_output([X_scrambled])[0]
     pdb.set_trace() 
     
 if __name__=="__main__":
