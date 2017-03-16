@@ -3,3 +3,4 @@
 *logs/
 *.hdf5
 *training_results
+.DS_Store

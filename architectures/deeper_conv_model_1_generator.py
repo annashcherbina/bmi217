@@ -1,7 +1,10 @@
+# A generator that provides a Keras model for training,
+# according to the guidelines in train_naive.py
 def createModel():
     import numpy as np
     np.random.seed(1337) # for reproducibility
 
+    # imports
     import keras;
     from keras.models import Sequential
     from keras.layers.core import Dropout, Reshape, Dense, Activation, Flatten
@@ -16,33 +19,58 @@ def createModel():
     print "Creating model..."
 
     model = Sequential()
-    model.add(Convolution2D(300,4,19,input_shape=(1,4,2000)))
+    # convolution layer with 500 filters of size 4x19
+    model.add(Convolution2D(500,4,19,input_shape=(1,4,2000)))
+    # batch normalization as a regularizer to prevent overfitting
     model.add(BatchNormalization(mode=0, axis=1))
+    # PReLU rectification activation
     model.add(PReLU())
+    # maxpooling to decrease feature set
     model.add(MaxPooling2D(pool_size=(1,3)))
 
-    model.add(Convolution2D(200,1,11,W_constraint=maxnorm(m=7)))
+    # convolution layer with 300 filters of size 1x11
+    model.add(Convolution2D(300,1,11,W_constraint=maxnorm(m=7)))
+    # batch normalization as a regularizer to prevent overfitting
     model.add(BatchNormalization(mode=0, axis=1))
+    # PReLU rectification activation
     model.add(PReLU())
+    # maxpooling to decrease feature set
     model.add(MaxPooling2D(pool_size=(1,4)))
 
-    model.add(Convolution2D(200,1,7,W_constraint=maxnorm(m=7)))
+    # convolution layer with 300 filters of size 1x7
+    model.add(Convolution2D(300,1,7,W_constraint=maxnorm(m=7)))
+    # batch normalization as a regularizer to prevent overfitting
     model.add(BatchNormalization(mode=0, axis=1))
+    # PReLU rectification activation
     model.add(PReLU())
+    # maxpooling to decrease feature set
+    model.add(MaxPooling2D(pool_size=(1,4)))
+
+    # convolution layer with 200 filters of size 1x5
+    model.add(Convolution2D(200,1,5,W_constraint=maxnorm(m=7)))
+    # batch normalization as a regularizer to prevent overfitting
+    model.add(BatchNormalization(mode=0, axis=1))
+    # PReLU rectification activation
+    model.add(PReLU())
+    # maxpooling to decrease feature set
     model.add(MaxPooling2D(pool_size=(1,4)))
 
     model.add(Flatten())
+    # fully connected layer, and PReLU and Dropout to prevent overfitting
     model.add(Dense(1000,activity_regularizer=activity_l1(0.00001),W_constraint=maxnorm(m=7)))
     model.add(PReLU())
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
 
+    # fully connected layer, and PReLU and Dropout to prevent overfitting
     model.add(Dense(1000,activity_regularizer=activity_l1(0.00001),W_constraint=maxnorm(m=7)))
     model.add(PReLU())
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
 
+    # fully connected layer and a sigmoidal activation
     model.add(Dense(61))
     model.add(Activation("sigmoid"))
 
+    # training optimizer
     adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
     
     print "Compiling model..."

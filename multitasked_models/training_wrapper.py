@@ -1,14 +1,23 @@
+# A program that trains a model provided by a generator
+# specified through the command line.  The model_path
+# command line argument must link to a valid Python
+# module with a function createModel(), that returns
+# the Keras model to train.
+
+# Imports
 import argparse
 import imp
 import numpy as np
 import h5py
 import scipy.io
 
-from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, CSVLogger
-
-global modelModule
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
 
+global modelModule
+
+# Parses the arguments passed by train_naive.sh, specifically the
+# path to the model generator, the training dataset path, the
+# validation dataset path, and the test dataset path.
 def parseArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument('model_path')
@@ -17,22 +26,27 @@ def parseArgs():
     parser.add_argument('test_path')
     return parser.parse_args()
 
+# Loads into memory the  validation data, training data, and
+# test data.
 def loadData(args):
     trainmat = h5py.File(args.train_path)
     validmat = h5py.File(args.valid_path)
     testmat = h5py.File(args.test_path)
 
-    x_train = trainmat['X']['sequence'][0:100000]
-    y_train = trainmat['Y']['output'][0:100000]
+    x_train = trainmat['X']['sequence']
+    y_train = trainmat['Y']['output']
     x_valid = validmat['X']['sequence']
     y_valid = validmat['Y']['output']
     x_test = testmat['X']['sequence']
     y_test = testmat['Y']['output']
     return x_train, y_train, x_valid, y_valid, x_test, y_test
 
+# Trains the network on the training data, and saves the best model
+# after every epoch.  After training, performs a quick evaluation of
+# the trained model.
 def fitAndEvaluate(model, model_path, 
             x_train, y_train, x_valid, y_valid, x_test, y_test):
-    NUM_EPOCHS = 2
+    NUM_EPOCHS = 5
     print "Running %d epochs" % (NUM_EPOCHS)
 
     model_output_path = "best_model_%s.hdf5" % (model_path[:-3])
@@ -56,21 +70,14 @@ def fitAndEvaluate(model, model_path,
 
     print results
 
+# Main function
 def main():
     args = parseArgs()
     model_path=args.model_path
     modelModule = imp.load_source('module.name', args.model_path)
     x_train, y_train, x_valid, y_valid, x_test, y_test = loadData(args)
     model = modelModule.createModel()
-<<<<<<< HEAD
-<<<<<<< HEAD
     fitAndEvaluate(model, args.model_path, x_train, y_train, x_valid, y_valid, x_test, y_test)
-=======
-    fitAndEvaluate(model,model_path,x_train, y_train, x_valid, y_valid, x_test, y_test)
->>>>>>> fa27a0b8fc1622f239827a173eaf276de9ecc861
-=======
-    fitAndEvaluate(model,model_path,x_train, y_train, x_valid, y_valid, x_test, y_test)
->>>>>>> fa27a0b8fc1622f239827a173eaf276de9ecc861
 
 if __name__ == "__main__":
     main()
