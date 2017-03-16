@@ -16,17 +16,22 @@ def createModel():
     print "Creating model..."
 
     model = Sequential()
-    model.add(Convolution2D(300,4,19,input_shape=(1,4,2000)))
+    model.add(Convolution2D(500,4,19,input_shape=(1,4,2000)))
     model.add(BatchNormalization(mode=0, axis=1))
     model.add(PReLU())
     model.add(MaxPooling2D(pool_size=(1,3)))
 
-    model.add(Convolution2D(200,1,11,W_constraint=maxnorm(m=7)))
+    model.add(Convolution2D(300,1,11,W_constraint=maxnorm(m=7)))
     model.add(BatchNormalization(mode=0, axis=1))
     model.add(PReLU())
     model.add(MaxPooling2D(pool_size=(1,4)))
 
-    model.add(Convolution2D(200,1,7,W_constraint=maxnorm(m=7)))
+    model.add(Convolution2D(300,1,7,W_constraint=maxnorm(m=7)))
+    model.add(BatchNormalization(mode=0, axis=1))
+    model.add(PReLU())
+    model.add(MaxPooling2D(pool_size=(1,4)))
+
+    model.add(Convolution2D(200,1,5,W_constraint=maxnorm(m=7)))
     model.add(BatchNormalization(mode=0, axis=1))
     model.add(PReLU())
     model.add(MaxPooling2D(pool_size=(1,4)))
@@ -34,11 +39,11 @@ def createModel():
     model.add(Flatten())
     model.add(Dense(1000,activity_regularizer=activity_l1(0.00001),W_constraint=maxnorm(m=7)))
     model.add(PReLU())
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
 
     model.add(Dense(1000,activity_regularizer=activity_l1(0.00001),W_constraint=maxnorm(m=7)))
     model.add(PReLU())
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
 
     model.add(Dense(61))
     model.add(Activation("sigmoid"))

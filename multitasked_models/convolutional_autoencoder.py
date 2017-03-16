@@ -34,6 +34,7 @@ def data_io(file_name):
     return x_data
 
 def model_development(x_train):
+    pdb.set_trace() 
     convolutional_autoencoder = Sequential()
     convolutional_autoencoder.add(Convolution2D(64, 3, 3, activation = 'relu', border_mode = 'same', input_shape = (1, 3, 2000)))
     convolutional_autoencoder.add(MaxPooling2D((1, 3)))
@@ -50,6 +51,7 @@ def model_development(x_train):
     convolutional_autoencoder.add(Convolution2D(64, 3, 3, activation = 'sigmoid', border_mode = 'same'))
     ada_delta = Adadelta(lr = 1.0, rho = 0.9, epsilon = 1e-08)
     convolutional_autoencoder.compile(optimizer = ada_delta, loss = 'hinge')
+    pdb.set_trace() 
     return convolutional_autoencoder
 
 def model_evaluation(x_train, x_validation, x_test, convolutional_autoencoder, results_directory):

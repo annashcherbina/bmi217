@@ -4,6 +4,8 @@ import numpy as np
 import h5py
 import scipy.io
 
+from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, CSVLogger
+
 global modelModule
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
 
@@ -30,7 +32,8 @@ def loadData(args):
 
 def fitAndEvaluate(model, model_path, 
             x_train, y_train, x_valid, y_valid, x_test, y_test):
-    print "Running only one epoch"
+    NUM_EPOCHS = 2
+    print "Running %d epochs" % (NUM_EPOCHS)
 
     model_output_path = "best_model_%s.hdf5" % (model_path[:-3])
     checkpointer = ModelCheckpoint(filepath=model_output_path, verbose=1, save_best_only=True)
@@ -41,7 +44,7 @@ def fitAndEvaluate(model, model_path,
     model.fit(x_train, 
         y_train, 
         batch_size=100, 
-        nb_epoch=1, 
+        nb_epoch=NUM_EPOCHS, 
         shuffle="batch", 
         show_accuracy=True, 
         validation_data=(x_valid, y_valid), 
@@ -59,7 +62,15 @@ def main():
     modelModule = imp.load_source('module.name', args.model_path)
     x_train, y_train, x_valid, y_valid, x_test, y_test = loadData(args)
     model = modelModule.createModel()
+<<<<<<< HEAD
+<<<<<<< HEAD
+    fitAndEvaluate(model, args.model_path, x_train, y_train, x_valid, y_valid, x_test, y_test)
+=======
     fitAndEvaluate(model,model_path,x_train, y_train, x_valid, y_valid, x_test, y_test)
+>>>>>>> fa27a0b8fc1622f239827a173eaf276de9ecc861
+=======
+    fitAndEvaluate(model,model_path,x_train, y_train, x_valid, y_valid, x_test, y_test)
+>>>>>>> fa27a0b8fc1622f239827a173eaf276de9ecc861
 
 if __name__ == "__main__":
     main()
